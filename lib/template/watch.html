@@ -4,10 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>{{file_name}} — File ² Link Player</title>
+  <title>{{file_name}} — ProXBotz Player</title>
 
   <!-- Open Graph Meta -->
-  <meta name="author" content="Goutham Josh (@GouthamSER)">
+  <meta name="author" content="ProXBotz">
   <meta property="og:title" content="{{file_name}}">
   <meta property="og:description"
     content="Stream and download {{file_name}} ({{file_size}}) with high-speed MTProto streaming.">
@@ -24,6 +24,9 @@
 
   <!-- Plyr Video Player CSS -->
   <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
+
+  <!-- movi-player: decodes MKV itself and exposes multi-audio / subtitle track menus (video only) -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/movi-player@0.4.1/dist/element.js"></script>
 
   <style>
     :root {
@@ -227,6 +230,16 @@
       background: #000;
       position: relative;
       min-height: 240px;
+    }
+
+    /* movi-player (video). Keep transform/filter/will-change OFF its ancestors,
+       otherwise its fullscreen gets trapped inside the card. */
+    movi-player {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: 85vh;
+      background: #000;
     }
 
     /* Audio Player Mode */
@@ -629,6 +642,18 @@
       margin-bottom: 6px;
     }
 
+    .powered-by {
+      margin: 8px 0 0;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+
+    .powered-by strong {
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
     .footer-credit {
       margin-top: 8px;
       font-size: 0.84rem;
@@ -738,9 +763,6 @@
       <a href="{{dl_url}}" class="btn-pill" title="Switch to Download page">
         <i class="fa-solid fa-download"></i> Download
       </a>
-      <a href="https://github.com/GouthamSER/FileToLink" target="_blank" rel="noopener noreferrer" class="btn-pill" title="Developer GitHub Repository">
-        <i class="fa-brands fa-github"></i> GitHub
-      </a>
       <a href="https://t.me/wudixh12" target="_blank" class="btn-pill primary">
         <i class="fa-brands fa-telegram"></i> Channel
       </a>
@@ -776,15 +798,12 @@
       </div>
     </div>
     {% else %}
-    <!-- Universal Video Player (Plyr handles MP4, MKV, WebM, etc.) -->
+    <!-- Video Player: movi-player (MP4, MKV, WebM ... with multi-audio + subtitle track menus) -->
     <div class="player-card">
       <div class="video-holder">
-        <video id="player" playsinline controls crossorigin preload="metadata">
-          <source src="{{file_url}}" type="{{mime_type}}">
-          <source src="{{file_url}}" type="video/mp4">
-          <source src="{{file_url}}" type="video/webm">
-          Your browser does not support HTML5 video streaming. Please use the external players below.
-        </video>
+        <movi-player id="player" src="{{file_url}}" title="{{file_name}}"
+                     controls playsinline fallback="native"
+                     theme="dark" themecolor="#8b5cf6"></movi-player>
       </div>
     </div>
     {% endif %}
@@ -905,14 +924,10 @@
   <!-- Footer -->
   <footer>
     <div class="footer-brand">FILE ² LINK STREAM SERVICE</div>
-    <p>© <span id="year"></span> File Stream Bot™. High-performance MTProto multi-client cloud streamer.</p>
-    <div class="footer-credit">
-      <span>Developer: <a href="https://github.com/GouthamSER" target="_blank" rel="noopener noreferrer" class="dev-link"><i class="fa-solid fa-code"></i> Goutham Josh</a> (<a href="https://github.com/GouthamSER" target="_blank" rel="noopener noreferrer" class="dev-link">@GouthamSER</a>)</span>
-    </div>
+    <p>© <span id="year"></span> ProXBotz. All rights reserved.</p>
+    <p class="powered-by">Powered by <strong>ProXBotz</strong></p>
     <div class="footer-links">
       <a href="https://t.me/wudixh15" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i> Updates</a>
-      <a href="https://github.com/GouthamSER/FileToLink" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> GitHub Repo</a>
-      <a href="https://github.com/GouthamSER" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github-alt"></i> @GouthamSER</a>
     </div>
   </footer>
 
@@ -931,10 +946,10 @@
     const fileName = {{ file_name | tojson }};
     const isAudio = {{ is_audio | tojson }};
 
-    // Initialize Plyr
+    // Initialize Plyr (audio files only - video is handled by <movi-player>)
     const playerEl = document.getElementById('player');
     let player;
-    if (playerEl) {
+    if (playerEl && playerEl.tagName === 'AUDIO') {
       player = new Plyr('#player', {
         controls: [
           'play-large',
@@ -969,6 +984,53 @@
         player.on('pause', () => disc.style.animationPlayState = 'paused');
         disc.style.animationPlayState = 'paused';
       }
+    }
+
+    // ── movi-player (video): multi-audio / subtitle track buttons ──────────────
+    // movi hides its track buttons in a tray on narrow screens, so we add our own
+    // buttons to the always-visible bar. They just open movi's own track menus.
+    if (playerEl && playerEl.tagName.toLowerCase() === 'movi-player') {
+      const TRACK_BUTTONS = [
+        {
+          id: 'f2l-audio-track', label: 'Audio track', title: 'Audio track',
+          selector: '.movi-audio-track-btn',
+          icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 14v-4a2 2 0 0 1 2-2h2l4-4v16l-4-4H6a2 2 0 0 1-2-2z"/><path d="M16 8.5a5 5 0 0 1 0 7"/><path d="M19 6a9 9 0 0 1 0 12"/></svg>'
+        },
+        {
+          id: 'f2l-subtitles', label: 'Subtitles', title: 'Subtitles and captions',
+          selector: '.movi-subtitle-track-btn',
+          icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 13h4M13 13h4M7 16h6"/></svg>'
+        }
+      ];
+
+      const addTrackButtons = () => {
+        if (typeof playerEl.addControl !== 'function') return;
+        const root = playerEl.shadowRoot;
+        if (!root) return;
+        for (const spec of TRACK_BUTTONS) {
+          // Nothing to open if the file has no track of this kind.
+          if (!root.querySelector(spec.selector)) continue;
+          try {
+            playerEl.addControl({
+              id: spec.id, label: spec.label, title: spec.title, icon: spec.icon,
+              before: 'more', placement: 'bar',
+              onSelect: () => root.querySelector(spec.selector)?.click()
+            });
+          } catch (e) { /* a control that will not register must not break the page */ }
+        }
+      };
+
+      // The player builds its chrome once the source is known, so wait for it.
+      if (customElements.get('movi-player')) addTrackButtons();
+      else customElements.whenDefined('movi-player').then(() => setTimeout(addTrackButtons, 0));
+
+      // movi fell back to the browser's native <video>: playback works, but only the first audio track.
+      playerEl.addEventListener('nativefallback', () => {
+        showToast('Basic player in use - for other audio tracks use VLC / MX Player below.', true);
+      });
+      playerEl.addEventListener('error', () => {
+        document.getElementById('codecNotice').classList.add('show');
+      });
     }
 
     // Toast Utility
@@ -1016,41 +1078,68 @@
       ta.remove();
     }
 
-    // External App Intent Launchers
-    function openVLC() {
-      // Android Intent scheme with universal fallback
-      const androidIntent = `intent:${fileUrl}#Intent;package=org.videolan.vlc;type=video/*;scheme=https;end;`;
-      // iOS / Desktop scheme
-      const vlcScheme = `vlc://${fileUrl}`;
+    // External App Launchers (same deep-link scheme as the ProXBotz/Thunder player)
+    const mimeType = {{ mime_type | tojson }};
+    const intentType = () => {
+      if (isAudio) return 'audio/*';
+      const m = String(mimeType || '').trim().toLowerCase();
+      if (m.startsWith('audio/')) return 'audio/*';
+      return 'video/*';
+    };
 
-      const isAndroid = /Android/i.test(navigator.userAgent);
-      if (isAndroid) {
-        window.location.href = androidIntent;
-      } else {
-        window.location.href = vlcScheme;
-      }
+    const buildAndroidIntent = (packageName, fallbackURL) => {
+      const u = new URL(fileUrl, window.location.href);
+      const scheme = u.protocol.replace(':', '') || 'https';
+      const noScheme = u.href.replace(/^[a-z][a-z0-9+.-]*:\/\//i, '').replace(/#/g, '%23');
+      const parts = [
+        `intent://${noScheme}#Intent`,
+        `scheme=${encodeURIComponent(scheme)}`,
+        'action=android.intent.action.VIEW',
+        `type=${intentType()}`,
+        `package=${packageName}`,
+        `S.title=${encodeURIComponent(fileName)}`
+      ];
+      if (fallbackURL) parts.push(`S.browser_fallback_url=${encodeURIComponent(fallbackURL)}`);
+      parts.push('end');
+      return parts.join(';');
+    };
+
+    const playStoreUrl = (pkg) => `https://play.google.com/store/apps/details?id=${encodeURIComponent(pkg)}`;
+    const isAndroidUA = () => /Android/i.test(navigator.userAgent);
+    const isIOSUA = () => /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+      (/macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+
+    function launchAndroid(pkg, label) {
+      window.location.href = buildAndroidIntent(pkg, playStoreUrl(pkg));
+      setTimeout(() => showToast(`Opening ${label}...`), 300);
+    }
+
+    function openVLC() {
+      const encoded = encodeURIComponent(fileUrl);
+      if (isAndroidUA()) return launchAndroid('org.videolan.vlc', 'VLC Media Player');
+      if (isIOSUA()) window.location.href = `vlc-x-callback://x-callback-url/stream?url=${encoded}`;
+      else window.location.href = `vlc://${fileUrl.replace(/#/g, '%23')}`;
       setTimeout(() => showToast('Opening VLC Media Player...'), 300);
     }
 
     function openMX() {
-      const mxIntent = `intent:${fileUrl}#Intent;package=com.mxtech.videoplayer.ad;type=video/*;scheme=https;end;`;
-      window.location.href = mxIntent;
-      setTimeout(() => showToast('Opening MX Player...'), 300);
+      launchAndroid('com.mxtech.videoplayer.ad', 'MX Player');
     }
 
     function openNPlayer() {
-      window.location.href = `nplayer-${fileUrl}`;
+      if (isAndroidUA()) return launchAndroid('com.newin.nplayer.pro', 'nPlayer');
+      window.location.href = `nplayer://weblink?url=${encodeURIComponent(fileUrl)}`;
       setTimeout(() => showToast('Opening nPlayer...'), 300);
     }
 
     function openKMPlayer() {
-      const kmIntent = `intent:${fileUrl}#Intent;package=com.kmplayer;type=video/*;scheme=https;end;`;
-      window.location.href = kmIntent;
+      if (isAndroidUA()) return launchAndroid('com.kmplayer', 'KMPlayer');
+      window.location.href = `kmplayer://${fileUrl.replace(/#/g, '%23')}`;
       setTimeout(() => showToast('Opening KMPlayer...'), 300);
     }
 
     function openPotPlayer() {
-      window.location.href = `potplayer://${fileUrl}`;
+      window.location.href = `potplayer://${fileUrl.replace(/#/g, '%23')}`;
       setTimeout(() => showToast('Opening PotPlayer...'), 300);
     }
   </script>
