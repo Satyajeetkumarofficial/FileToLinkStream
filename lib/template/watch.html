@@ -234,11 +234,25 @@
 
     /* movi-player (video). Keep transform/filter/will-change OFF its ancestors,
        otherwise its fullscreen gets trapped inside the card. */
-    movi-player {
+    /* The frame follows the video's real aspect ratio (--ar is set from JS once
+       the video size is known; 16:9 until then). Wide, 4:3, 21:9 and vertical
+       videos all fit with no stretching or extra bars, and the frame never gets
+       taller than the screen. */
+    .video-holder.movi-frame {
+      --ar: 1.7778;
+      width: min(100%, calc(82dvh * var(--ar)));
+      aspect-ratio: var(--ar);
+      min-height: 0;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .video-holder.movi-frame movi-player {
+      position: absolute;
+      inset: 0;
       display: block;
       width: 100%;
-      aspect-ratio: 16 / 9;
-      max-height: 85vh;
+      height: 100%;
       background: #000;
     }
 
@@ -506,6 +520,29 @@
       text-align: center;
     }
 
+    /* Full-width, horizontal card (Choose App) */
+    .app-card.wide {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 14px;
+      padding: 14px 18px;
+      text-align: left;
+    }
+
+    .app-card.wide .wide-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .app-card.wide .wide-arrow {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
     .app-card:hover {
       transform: translateY(-3px);
       border-color: var(--accent-purple);
@@ -530,6 +567,15 @@
 
     .app-icon.mx {
       background: #1976d2;
+      color: #fff;
+    }
+
+    .app-icon.mx.pro {
+      background: #f5a623;
+    }
+
+    .app-icon.chooser {
+      background: #0d9488;
       color: #fff;
     }
 
@@ -800,7 +846,7 @@
     {% else %}
     <!-- Video Player: movi-player (MP4, MKV, WebM ... with multi-audio + subtitle track menus) -->
     <div class="player-card">
-      <div class="video-holder">
+      <div class="video-holder movi-frame" id="videoFrame">
         <movi-player id="player" src="{{file_url}}" title="{{file_name}}"
                      controls playsinline fallback="native"
                      theme="dark" themecolor="#8b5cf6"></movi-player>
@@ -840,6 +886,16 @@
       </div>
 
       <div class="player-apps-grid">
+        <!-- Choose any installed player (first, full-width) -->
+        <a class="app-card wide" onclick="openChooser()" title="Choose any installed video player">
+          <div class="app-icon chooser"><i class="fa-solid fa-list"></i></div>
+          <div class="wide-text">
+            <span class="app-name">Choose App</span>
+            <span class="app-sub">Android &middot; pick any installed player (MX, VLC, etc.)</span>
+          </div>
+          <i class="fa-solid fa-chevron-right wide-arrow"></i>
+        </a>
+
         <!-- VLC -->
         <a class="app-card" onclick="openVLC()" title="Open in VLC Media Player">
           <div class="app-icon vlc"><i class="fa-solid fa-traffic-cone"></i></div>
@@ -851,6 +907,13 @@
         <a class="app-card" onclick="openMX()" title="Open in MX Player">
           <div class="app-icon mx"><i class="fa-solid fa-play"></i></div>
           <span class="app-name">MX Player</span>
+          <span class="app-sub">Android</span>
+        </a>
+
+        <!-- MX Player Pro (APK / paid build uses a different package) -->
+        <a class="app-card" onclick="openMXPro()" title="Open in MX Player Pro">
+          <div class="app-icon mx pro"><i class="fa-solid fa-play"></i></div>
+          <span class="app-name">MX Player Pro</span>
           <span class="app-sub">Android</span>
         </a>
 
@@ -1024,6 +1087,55 @@
       if (customElements.get('movi-player')) addTrackButtons();
       else customElements.whenDefined('movi-player').then(() => setTimeout(addTrackButtons, 0));
 
+      // ── Fit the frame to the video's real aspect ratio ──────────────────────
+      const frame = document.getElementById('videoFrame');
+      let arDone = false;
+      const applyAspect = (w, h) => {
+        if (!frame || !w || !h) return false;
+        // Skip the default size of an empty <canvas> (300x150).
+        if (w === 300 && h === 150) return false;
+        const ar = Math.min(3, Math.max(0.4, w / h));
+        frame.style.setProperty('--ar', ar.toFixed(4));
+        arDone = true;
+        return true;
+      };
+
+      // Looks for the decoded video size anywhere inside the player (shadow DOM included).
+      const findVideoSize = () => {
+        if (playerEl.videoWidth && playerEl.videoHeight) return [playerEl.videoWidth, playerEl.videoHeight];
+        const scan = (root) => {
+          if (!root) return null;
+          for (const v of root.querySelectorAll('video')) {
+            if (v.videoWidth && v.videoHeight) return [v.videoWidth, v.videoHeight];
+          }
+          for (const c of root.querySelectorAll('canvas')) {
+            if (c.width > 0 && c.height > 0 && !(c.width === 300 && c.height === 150)) return [c.width, c.height];
+          }
+          for (const el of root.querySelectorAll('*')) {
+            if (el.shadowRoot) {
+              const r = scan(el.shadowRoot);
+              if (r) return r;
+            }
+          }
+          return null;
+        };
+        return scan(playerEl.shadowRoot);
+      };
+
+      const tryFit = () => {
+        if (arDone) return true;
+        const size = findVideoSize();
+        return size ? applyAspect(size[0], size[1]) : false;
+      };
+
+      ['loadedmetadata', 'loadeddata', 'canplay', 'playing', 'resize'].forEach((ev) =>
+        playerEl.addEventListener(ev, tryFit));
+      // Fallback: poll for up to ~30s in case the player does not emit those events.
+      let fitTries = 0;
+      const fitTimer = setInterval(() => {
+        if (tryFit() || ++fitTries > 60) clearInterval(fitTimer);
+      }, 500);
+
       // movi fell back to the browser's native <video>: playback works, but only the first audio track.
       playerEl.addEventListener('nativefallback', () => {
         showToast('Basic player in use - for other audio tracks use VLC / MX Player below.', true);
@@ -1096,9 +1208,9 @@
         `scheme=${encodeURIComponent(scheme)}`,
         'action=android.intent.action.VIEW',
         `type=${intentType()}`,
-        `package=${packageName}`,
         `S.title=${encodeURIComponent(fileName)}`
       ];
+      if (packageName) parts.push(`package=${packageName}`);
       if (fallbackURL) parts.push(`S.browser_fallback_url=${encodeURIComponent(fallbackURL)}`);
       parts.push('end');
       return parts.join(';');
@@ -1124,6 +1236,20 @@
 
     function openMX() {
       launchAndroid('com.mxtech.videoplayer.ad', 'MX Player');
+    }
+
+    function openMXPro() {
+      launchAndroid('com.mxtech.videoplayer.pro', 'MX Player Pro');
+    }
+
+    // No package: Android shows every installed player (works for MX APK / modded builds too).
+    function openChooser() {
+      if (!isAndroidUA()) {
+        showToast('Choose App works on Android only.', true);
+        return;
+      }
+      window.location.href = buildAndroidIntent('', null);
+      setTimeout(() => showToast('Choose a player...'), 300);
     }
 
     function openNPlayer() {
