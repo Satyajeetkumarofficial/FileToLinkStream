@@ -570,8 +570,9 @@
       color: #fff;
     }
 
-    .app-icon.mx.pro {
-      background: #f5a623;
+    .app-icon.playit {
+      background: #ff7a00;
+      color: #fff;
     }
 
     .app-icon.chooser {
@@ -801,7 +802,7 @@
 
   <!-- Header -->
   <header>
-    <a class="brand" href="https://t.me/wudixh12" target="_blank">
+    <a class="brand" href="https://t.me/ProXBotz" target="_blank">
       <div class="brand-icon"><i class="fa-solid fa-play"></i></div>
       <span>FILE ² <b>LINK</b></span>
     </a>
@@ -809,7 +810,7 @@
       <a href="{{dl_url}}" class="btn-pill" title="Switch to Download page">
         <i class="fa-solid fa-download"></i> Download
       </a>
-      <a href="https://t.me/wudixh12" target="_blank" class="btn-pill primary">
+      <a href="https://t.me/ProXBotz" target="_blank" class="btn-pill primary">
         <i class="fa-brands fa-telegram"></i> Channel
       </a>
     </div>
@@ -910,10 +911,10 @@
           <span class="app-sub">Android</span>
         </a>
 
-        <!-- MX Player Pro (APK / paid build uses a different package) -->
-        <a class="app-card" onclick="openMXPro()" title="Open in MX Player Pro">
-          <div class="app-icon mx pro"><i class="fa-solid fa-play"></i></div>
-          <span class="app-name">MX Player Pro</span>
+        <!-- PLAYit -->
+        <a class="app-card" onclick="openPlayit()" title="Open in PLAYit">
+          <div class="app-icon playit"><i class="fa-solid fa-circle-play"></i></div>
+          <span class="app-name">PLAYit</span>
           <span class="app-sub">Android</span>
         </a>
 
@@ -990,7 +991,7 @@
     <p>© <span id="year"></span> ProXBotz. All rights reserved.</p>
     <p class="powered-by">Powered by <strong>ProXBotz</strong></p>
     <div class="footer-links">
-      <a href="https://t.me/wudixh15" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i> Updates</a>
+      <a href="https://t.me/ProXBotz" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i> Updates</a>
     </div>
   </footer>
 
@@ -1238,8 +1239,8 @@
       launchAndroid('com.mxtech.videoplayer.ad', 'MX Player');
     }
 
-    function openMXPro() {
-      launchAndroid('com.mxtech.videoplayer.pro', 'MX Player Pro');
+    function openPlayit() {
+      launchAndroid('com.playit.videoplayer', 'PLAYit');
     }
 
     // No package: Android shows every installed player (works for MX APK / modded builds too).
