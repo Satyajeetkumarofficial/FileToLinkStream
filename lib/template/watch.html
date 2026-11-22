@@ -478,6 +478,90 @@
     }
 
     /* External Players Grid */
+    /* ── Audio & Subtitles panel (from movi page) ── */
+    .tracks {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .tcard {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+
+    .tcard h3 {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tcard select {
+      width: 100%;
+      background: var(--bg-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font: inherit;
+      font-size: 0.88rem;
+    }
+
+    .tcard select:disabled { opacity: 0.55; }
+
+    .drow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .drow input[type=range] { flex: 1; min-width: 0; accent-color: var(--accent-purple); }
+
+    .sbtn {
+      background: var(--bg-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      font: inherit;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+
+    .sbtn:active { transform: scale(0.96); }
+
+    #dVal {
+      min-width: 44px;
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .f2l-banner {
+      display: none;
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.35);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .f2l-banner.show { display: block; }
+    .f2l-banner.warn { background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.35); }
+    .f2l-banner a { color: var(--accent-cyan); }
+
     .section-header {
       font-size: 0.8rem;
       text-transform: uppercase;
@@ -828,6 +912,8 @@
           class="fa-solid fa-arrow-up-right-from-square"></i></button>
     </div>
 
+    <div class="f2l-banner" id="banner"></div>
+
     <!-- Media Player -->
     {% if is_audio %}
     <!-- Dedicated Audio Mode -->
@@ -847,11 +933,8 @@
     {% else %}
     <!-- Video Player: movi-player (MP4, MKV, WebM ... with multi-audio + subtitle track menus) -->
     <div class="player-card">
-      <div class="video-holder movi-frame" id="videoFrame">
-        <movi-player id="player" src="{{file_url}}" title="{{file_name}}"
-                     controls playsinline fallback="native"
-                     theme="dark" themecolor="#8b5cf6"></movi-player>
-      </div>
+      <!-- <movi-player> is created by the script below (needs the library + a RAM buffer size) -->
+      <div class="video-holder movi-frame" id="videoFrame"></div>
     </div>
     {% endif %}
 
@@ -880,6 +963,29 @@
           <i class="fa-solid fa-file-arrow-down"></i> Download Page
         </a>
       </div>
+
+      {% if not is_audio %}
+      <!-- Audio & Subtitles -->
+      <div class="section-header">
+        <i class="fa-solid fa-sliders"></i> Audio &amp; Subtitles
+      </div>
+      <div class="tracks">
+        <div class="tcard">
+          <h3><i class="fa-solid fa-volume-high"></i> Audio track</h3>
+          <select id="audioSel" disabled><option>Loading…</option></select>
+        </div>
+        <div class="tcard">
+          <h3><i class="fa-regular fa-closed-captioning"></i> Subtitles</h3>
+          <select id="subSel" disabled><option>Loading…</option></select>
+          <div class="drow">
+            <button class="sbtn" id="dMinus" type="button">−0.5s</button>
+            <input type="range" id="delay" min="-10" max="10" step="0.1" value="0">
+            <button class="sbtn" id="dPlus" type="button">+0.5s</button>
+            <span id="dVal">0.0s</span>
+          </div>
+        </div>
+      </div>
+      {% endif %}
 
       <!-- External Apps Launch Grid -->
       <div class="section-header">
@@ -945,6 +1051,13 @@
           <span class="app-name">Stream URL</span>
           <span class="app-sub">Kodi / Infuse</span>
         </a>
+
+        <!-- Share -->
+        <a class="app-card" onclick="shareLink()" title="Share this stream link">
+          <div class="app-icon copy-stream"><i class="fa-solid fa-share-nodes"></i></div>
+          <span class="app-name">Share</span>
+          <span class="app-sub">Send link</span>
+        </a>
       </div>
 
       <!-- Technical Stream Specs -->
@@ -968,6 +1081,16 @@
           <span class="spec-label">Format Container</span>
           <span class="spec-val">{{file_ext}}</span>
         </div>
+        {% if not is_audio %}
+        <div class="spec-item">
+          <span class="spec-label">Tracks</span>
+          <span class="spec-val" id="trackInfo">…</span>
+        </div>
+        <div class="spec-item">
+          <span class="spec-label">RAM Buffer Cap</span>
+          <span class="spec-val" id="memInfo">…</span>
+        </div>
+        {% endif %}
         <div class="spec-item">
           <span class="spec-label">Stream Protocol</span>
           <span class="spec-val">HTTP/1.1 Chunked Byte-Range (206)</span>
@@ -1050,60 +1173,121 @@
       }
     }
 
-    // ── movi-player (video): multi-audio / subtitle track buttons ──────────────
-    // movi hides its track buttons in a tray on narrow screens, so we add our own
-    // buttons to the always-visible bar. They just open movi's own track menus.
-    if (playerEl && playerEl.tagName.toLowerCase() === 'movi-player') {
-      const TRACK_BUTTONS = [
-        {
-          id: 'f2l-audio-track', label: 'Audio track', title: 'Audio track',
-          selector: '.movi-audio-track-btn',
-          icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 14v-4a2 2 0 0 1 2-2h2l4-4v16l-4-4H6a2 2 0 0 1-2-2z"/><path d="M16 8.5a5 5 0 0 1 0 7"/><path d="M19 6a9 9 0 0 1 0 12"/></svg>'
-        },
-        {
-          id: 'f2l-subtitles', label: 'Subtitles', title: 'Subtitles and captions',
-          selector: '.movi-subtitle-track-btn',
-          icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 13h4M13 13h4M7 16h6"/></svg>'
-        }
-      ];
+    // Share (native share sheet, falls back to copy)
+    function shareLink() {
+      if (navigator.share) {
+        navigator.share({ title: document.title, url: fileUrl }).catch(() => {});
+      } else {
+        copyStreamUrl();
+      }
+    }
 
-      const addTrackButtons = () => {
-        if (typeof playerEl.addControl !== 'function') return;
-        const root = playerEl.shadowRoot;
-        if (!root) return;
-        for (const spec of TRACK_BUTTONS) {
-          // Nothing to open if the file has no track of this kind.
-          if (!root.querySelector(spec.selector)) continue;
-          try {
-            playerEl.addControl({
-              id: spec.id, label: spec.label, title: spec.title, icon: spec.icon,
-              before: 'more', placement: 'bar',
-              onSelect: () => root.querySelector(spec.selector)?.click()
-            });
-          } catch (e) { /* a control that will not register must not break the page */ }
-        }
+    // ── <movi-player> (video): multi-audio, subtitles + delay, resume ──────────
+    if (!isAudio) {
+      const $ = (id) => document.getElementById(id);
+      const banner = $('banner');
+      const frame = $('videoFrame');
+      let el = null;
+      let disposed = false;
+      const CDN = 'https://cdn.jsdelivr.net/npm/movi-player@0.4.1/dist/element.js';
+
+      const say = (html, cls) => {
+        banner.className = 'f2l-banner show ' + (cls || '');
+        banner.innerHTML = html;
+      };
+      const fallbackBanner = (reason) => {
+        if (disposed) return;
+        say('<i class="fa-solid fa-triangle-exclamation"></i> ' + reason +
+            ' <a href="' + fileUrl + '" download>Download the file</a> or open it in VLC / MX Player below.');
+        $('codecNotice').classList.add('show');
       };
 
-      // The player builds its chrome once the source is known, so wait for it.
-      if (customElements.get('movi-player')) addTrackButtons();
-      else customElements.whenDefined('movi-player').then(() => setTimeout(addTrackButtons, 0));
+      const lang = (t) => (t && (t.language || t.lang)) || '';
+      const trackLabel = (t, i, kind) => {
+        const parts = [];
+        if (t.label || t.title || t.name) parts.push(t.label || t.title || t.name);
+        if (lang(t) && lang(t) !== 'und') parts.push(lang(t).toUpperCase());
+        if (t.codec) parts.push(t.codec);
+        if (kind === 'a' && t.channels) parts.push(t.channels + 'ch');
+        return parts.length ? parts.join(' · ') : (kind === 'a' ? 'Audio ' : 'Subtitle ') + (i + 1);
+      };
 
-      // ── Fit the frame to the video's real aspect ratio ──────────────────────
-      const frame = document.getElementById('videoFrame');
+      // RAM buffer by device (movi default cap is 250 MB)
+      const mem = navigator.deviceMemory || 0;
+      const mobile = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
+      const bufMB = mem ? (mem <= 2 ? 32 : mem <= 4 ? 64 : 128) : (mobile ? 48 : 64);
+      $('memInfo').textContent = bufMB + ' MB';
+
+      const mp = () => el && el.player;
+
+      const syncSel = () => {
+        const p = mp();
+        if (!p) return;
+        try {
+          const at = p.trackManager && p.trackManager.getActiveAudioTrack && p.trackManager.getActiveAudioTrack();
+          if (at && at.id != null) $('audioSel').value = String(at.id);
+          const st = p.trackManager && p.trackManager.getActiveSubtitleTrack && p.trackManager.getActiveSubtitleTrack();
+          if (!$('subSel').disabled) $('subSel').value = st && st.id != null ? String(st.id) : '';
+        } catch (e) {}
+      };
+
+      const refresh = () => {
+        const p = mp();
+        if (!p) return;
+        let a = [], sub = [];
+        try { a = p.getAudioTracks() || []; sub = p.getSubtitleTracks() || []; } catch (e) {}
+        const as = $('audioSel'), ss = $('subSel');
+        as.innerHTML = ''; ss.innerHTML = '';
+        a.forEach((t, i) => as.add(new Option(trackLabel(t, i, 'a'), t.id)));
+        as.disabled = a.length < 2;
+        if (!a.length) as.add(new Option('No audio track', ''));
+        if (sub.length) {
+          ss.add(new Option('Off', ''));
+          sub.forEach((t, i) => ss.add(new Option(trackLabel(t, i, 's'), t.id)));
+          ss.disabled = false;
+        } else {
+          ss.add(new Option('No subtitle tracks', ''));
+          ss.disabled = true;
+        }
+        $('trackInfo').textContent = a.length + ' audio · ' + sub.length + ' subtitle';
+        syncSel();
+      };
+
+      $('audioSel').addEventListener('change', function () {
+        const p = mp(); if (!p) return;
+        try { p.selectAudioTrack(Number(this.value)); showToast('Audio switched'); }
+        catch (e) { showToast('Audio switch failed', true); }
+      });
+      $('subSel').addEventListener('change', async function () {
+        const p = mp(); if (!p) return;
+        try {
+          await p.selectSubtitleTrack(this.value === '' ? null : Number(this.value));
+          showToast(this.value === '' ? 'Subtitles off' : 'Subtitles on');
+        } catch (e) { showToast('Subtitle switch failed', true); }
+      });
+
+      const setDelay = (v) => {
+        v = Math.max(-10, Math.min(10, Math.round(v * 10) / 10));
+        $('delay').value = v;
+        $('dVal').textContent = v.toFixed(1) + 's';
+        if (el) { try { el.subtitleDelay = v; } catch (e) {} }
+      };
+      $('delay').addEventListener('input', function () { setDelay(parseFloat(this.value)); });
+      $('dMinus').addEventListener('click', () => setDelay(parseFloat($('delay').value) - 0.5));
+      $('dPlus').addEventListener('click', () => setDelay(parseFloat($('delay').value) + 0.5));
+
+      // ── Fit the frame to the video's real aspect ratio ──
       let arDone = false;
       const applyAspect = (w, h) => {
         if (!frame || !w || !h) return false;
-        // Skip the default size of an empty <canvas> (300x150).
-        if (w === 300 && h === 150) return false;
+        if (w === 300 && h === 150) return false; // empty <canvas> default
         const ar = Math.min(3, Math.max(0.4, w / h));
         frame.style.setProperty('--ar', ar.toFixed(4));
         arDone = true;
         return true;
       };
-
-      // Looks for the decoded video size anywhere inside the player (shadow DOM included).
       const findVideoSize = () => {
-        if (playerEl.videoWidth && playerEl.videoHeight) return [playerEl.videoWidth, playerEl.videoHeight];
+        if (el.videoWidth && el.videoHeight) return [el.videoWidth, el.videoHeight];
         const scan = (root) => {
           if (!root) return null;
           for (const v of root.querySelectorAll('video')) {
@@ -1112,37 +1296,73 @@
           for (const c of root.querySelectorAll('canvas')) {
             if (c.width > 0 && c.height > 0 && !(c.width === 300 && c.height === 150)) return [c.width, c.height];
           }
-          for (const el of root.querySelectorAll('*')) {
-            if (el.shadowRoot) {
-              const r = scan(el.shadowRoot);
-              if (r) return r;
-            }
+          for (const n of root.querySelectorAll('*')) {
+            if (n.shadowRoot) { const r = scan(n.shadowRoot); if (r) return r; }
           }
           return null;
         };
-        return scan(playerEl.shadowRoot);
+        return scan(el.shadowRoot);
       };
-
       const tryFit = () => {
         if (arDone) return true;
-        const size = findVideoSize();
+        const size = el && findVideoSize();
         return size ? applyAspect(size[0], size[1]) : false;
       };
 
-      ['loadedmetadata', 'loadeddata', 'canplay', 'playing', 'resize'].forEach((ev) =>
-        playerEl.addEventListener(ev, tryFit));
-      // Fallback: poll for up to ~30s in case the player does not emit those events.
-      let fitTries = 0;
-      const fitTimer = setInterval(() => {
-        if (tryFit() || ++fitTries > 60) clearInterval(fitTimer);
-      }, 500);
+      const build = () => {
+        el = document.createElement('movi-player');
+        el.id = 'player';
+        el.setAttribute('src', fileUrl);
+        el.setAttribute('title', fileName);
+        el.setAttribute('controls', '');
+        el.setAttribute('playsinline', '');
+        el.setAttribute('fallback', 'native');
+        el.setAttribute('preload', 'metadata');
+        el.setAttribute('buffersize', String(bufMB * 1024 * 1024));
+        el.setAttribute('subtitlepicker', '');
+        el.setAttribute('resume', '');
+        el.setAttribute('resumekey', 'f2l-' + {{ file_unique_id | tojson }});
+        el.setAttribute('theme', 'dark');
+        el.setAttribute('themecolor', '#8b5cf6');
+        el.setAttribute('smoothwarning', '');
+        frame.appendChild(el);
 
-      // movi fell back to the browser's native <video>: playback works, but only the first audio track.
-      playerEl.addEventListener('nativefallback', () => {
-        showToast('Basic player in use - for other audio tracks use VLC / MX Player below.', true);
+        el.addEventListener('loadeddata', refresh);
+        el.addEventListener('trackschange', refresh);
+        el.addEventListener('audiotrackchange', syncSel);
+        el.addEventListener('subtitletrackchange', syncSel);
+        el.addEventListener('error', () => fallbackBanner('Advanced player failed on this file.'));
+        el.addEventListener('nativefallback', () =>
+          say('Using browser-native playback (track switching limited).', 'warn'));
+
+        ['loadedmetadata', 'loadeddata', 'canplay', 'playing', 'resize'].forEach((ev) =>
+          el.addEventListener(ev, tryFit));
+        let fitTries = 0;
+        const fitTimer = setInterval(() => {
+          if (tryFit() || ++fitTries > 60) clearInterval(fitTimer);
+        }, 500);
+      };
+
+      // Free decoders / WASM memory when leaving the page
+      window.addEventListener('pagehide', () => {
+        if (disposed) return;
+        disposed = true;
+        try { if (el && el.player && el.player.dispose) el.player.dispose(); } catch (e) {}
+        try { if (el && el.remove) el.remove(); } catch (e) {}
       });
-      playerEl.addEventListener('error', () => {
-        document.getElementById('codecNotice').classList.add('show');
+
+      if (typeof VideoDecoder === 'undefined' || typeof WebAssembly === 'undefined') {
+        say('This browser lacks WebCodecs (need Chrome/Edge 94+, Safari 16.4+, Firefox 130+) - ' +
+            'basic playback only, use VLC / MX Player for other audio tracks.', 'warn');
+      }
+
+      // The library is loaded by the <script type="module"> in <head>. Wait for it.
+      const libTimer = setTimeout(() => {
+        if (!window.customElements.get('movi-player')) fallbackBanner('Player library timed out (≈12 MB first load).');
+      }, 25000);
+      window.customElements.whenDefined('movi-player').then(() => {
+        clearTimeout(libTimer);
+        if (!disposed) build();
       });
     }
 
