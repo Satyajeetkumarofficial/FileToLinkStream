@@ -1,4 +1,6 @@
 import sys, glob, importlib, logging, logging.config, pytz, asyncio, os, signal
+from dotenv import load_dotenv
+load_dotenv()
 
 # uvloop = much faster event loop (big win for high-throughput streaming).
 # MUST be installed before pyrogram Client is created (it grabs the loop).
