@@ -9,7 +9,7 @@ class script(object):
 ⚡ ɪɴsᴛᴀɴᴛ ʟɪɴᴋs, ɴᴏ ᴡᴀɪᴛɪɴɢ
 🎬 ᴡᴀᴛᴄʜ ɪɴ ʙʀᴏᴡsᴇʀ, ɴᴏ ᴀᴘᴘ ɴᴇᴇᴅᴇᴅ
 🎧 ᴍᴜʟᴛɪ-ᴀᴜᴅɪᴏ + ᴇxᴛᴇʀɴᴀʟ sᴜʙᴛɪᴛʟᴇs
-📥 ʀᴇsᴜᴍᴀʙʟᴇ ᴅᴏᴡɴʟᴏᴀᴅs
+📥 ʀᴇsᴜᴍᴀʙʟᴇ ᴅᴏᴡɴʟᴏᴀᴅs (ᴡᴏʀᴋs ᴡɪᴛʜ ꜰ2ʟ ᴀᴘᴘ)
 🚀 ᴍᴜʟᴛɪ-ᴄʟɪᴇɴᴛ ʟᴏᴀᴅ ʙᴀʟᴀɴᴄɪɴɢ
 🔒 sᴀꜰᴇ ᴀɴᴅ ᴘʀɪᴠᴀᴛᴇ</blockquote>
 
@@ -34,4 +34,4 @@ class script(object):
 ⏰ <b>ᴛɪᴍᴇ</b> : <code>{}</code>
 🌏 <b>ᴢᴏɴᴇ</b> : <code>Asia/Kolkata</code>
 🟢 <b>sᴛᴀᴛᴜs</b> : <code>ᴏɴʟɪɴᴇ</code>
-🛠️ <b>ʙᴜɪʟᴅ</b> : <code>v1.3.1</code></blockquote>"""
+🛠️ <b>ʙᴜɪʟᴅ</b> : <code>v1.4.0</code></blockquote>"""

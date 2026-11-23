@@ -90,7 +90,7 @@ async def start(client, message):
         )
 
     rm = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("✨ Update Channel", url="https://t.me/wudixh15")]]
+        [[InlineKeyboardButton("✨ Update Channel", url="https://t.me/ProXBotz")]]
     )
     await client.send_message(
         chat_id=user_id,
@@ -119,7 +119,7 @@ async def check_fsub_callback(client, callback_query: CallbackQuery):
                 script.LOG_TEXT_P.format(user_id, callback_query.from_user.mention),
             )
         rm = InlineKeyboardMarkup(
-            [[InlineKeyboardButton("✨ Update Channel", url="https://t.me/wudixh15")]]
+            [[InlineKeyboardButton("✨ Update Channel", url="https://t.me/ProXBotz")]]
         )
         await client.send_message(
             chat_id=user_id,

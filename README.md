@@ -8,7 +8,7 @@
 
 [![Version](https://img.shields.io/badge/Version-v1.2.0-8B5CF6?style=for-the-badge&logo=git&logoColor=white)](#-changelog)
 [![Python Version](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)
-[![Telegram Engine](https://img.shields.io/badge/Telegram-MTProto%20v2-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/wudixh15)
+[![Telegram Engine](https://img.shields.io/badge/Telegram-MTProto%20v2-26A5E4?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/ProXBotz)
 [![Async Server](https://img.shields.io/badge/Server-aiohttp%20Speedups-FF6B6B?style=for-the-badge&logo=aiohttp&logoColor=white)](https://aiohttp.readthedocs.io)
 [![Database](https://img.shields.io/badge/Database-MongoDB%20Async-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com)
 [![Docker](https://img.shields.io/badge/Container-Docker%20Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
@@ -17,7 +17,7 @@
   <b>Send any Telegram file → Get instant high-speed streaming links & direct downloads with multi-client load balancing.</b>
 </p>
 
-[Deploy to Koyeb](https://app.koyeb.com/deploy?type=git&repository=github.com/GouthamSER/FileToLink&branch=main&builder=dockerfile) • [Deploy to Heroku](https://heroku.com/deploy?template=https://github.com/GouthamSER/FileToLink) • [Deploy to Render](https://render.com/deploy?repo=https://github.com/GouthamSER/FileToLink) • [Telegram Updates](https://t.me/wudixh15)
+[Deploy to Koyeb](https://app.koyeb.com/deploy?type=git&repository=github.com/Satyajeetkumarofficial/FileToLinkStream&branch=main&builder=dockerfile) • [Deploy to Heroku](https://heroku.com/deploy?template=https://github.com/Satyajeetkumarofficial/FileToLinkStream) • [Deploy to Render](https://render.com/deploy?repo=https://github.com/Satyajeetkumarofficial/FileToLinkStream) • [Telegram Updates](https://t.me/ProXBotz)
 
 </div>
 
@@ -25,18 +25,31 @@
 
 ## 🌟 Highlights & Key Features
 
-### 🎬 Universal Streaming Web Player (`/watch/{id}`)
-- **Universal Format Engine**: Native support for all major containers: `.mkv`, `.mp4`, `.webm`, `.avi`, `.mov`, `.flv`, `.m4v`, `.ts`, and `.3gp`.
-- **Dedicated Music & Audio Mode**: Audio files (`.mp3`, `.flac`, `.wav`, `.ogg`, `.m4a`, `.aac`) automatically switch to an ambient vinyl disc visualizer player.
-- **Cyberpunk Glassmorphism UI**: Ultra-clean obsidian theme (`#07070b`) with ambient neon glows, frosted glass cards, and Google Fonts typography (`Plus Jakarta Sans` & `JetBrains Mono`).
-- **One-Click External App Launchers**: Deep intent launchers for:
-  - 🚗 **VLC Media Player** (Universal Android Intent & iOS `vlc://` scheme)
-  - ⚡ **MX Player** (Android Intent)
-  - 🍎 **nPlayer** (iOS & macOS deep link)
-  - 🎞️ **KMPlayer** & 🖥️ **PotPlayer** (Windows PC)
-  - 🌐 **Raw Network Stream URL Copy** for Kodi, Infuse, and IINA
-- **Smart Codec Fallback Guard**: Automatically alerts users if their browser lacks native decoders for complex MKV/HEVC/AC3 codecs and offers a one-tap jump into VLC/MX Player.
-- **Keyboard Shortcuts**: Desktop control with `Space` (Play/Pause), `←/→` (Seek ±10s), `↑/↓` (Volume), `F` (Fullscreen), and `M` (Mute).
+🚀 File 2 Link v1.4 — What's New
+
+🎬 New player (Movi Player)
+• Switch audio tracks (multi-language MKV)
+• Subtitles on/off, with delay adjust
+• Plays more formats (MKV, HEVC, AC3)
+• Resumes where you left off
+• Open in VLC / MX Player / nPlayer / KMPlayer / PotPlayer
+
+✨ New liquid-glass page design
+
+⚡ Faster & more stable
+• Fewer crashes with many users at once
+• Smoother streaming, no more stalls under load
+
+📱 Tip: Chrome / Edge / Safari 16.4+ recommended.
+For 4K or DTS audio, use "Open in VLC".
+
+Dev: [@Satyajeetkumarofficial](https://github.com/Satyajeetkumarofficial)
+
+### 🎞️ Movi Player v0.4.1 (`/watch/{id}`, `/stream/{id}`, `/movi/{id}` — all same page)
+- Embedded **audio track** and **subtitle track** switching (MKV/MP4), subtitle delay, resume position.
+- Pinned CDN version + SRI hash. Override with `MOVI_SRC` / `MOVI_SRI` (empty `MOVI_SRI` disables the check).
+- RAM buffer auto-sized by device (32–128 MB). If WebCodecs/library unavailable, shows error + download link.
+- Not decoded: DTS / TrueHD audio. HEVC/AV1 without hardware decode is CPU heavy.
 
 ### 🚀 Direct Download Hub (`/{id}`)
 - **Gigabit Chunked Streaming**: Full HTTP/1.1 Range header support (`206 Partial Content`) for multi-threaded download accelerators (IDM, 1DM, ADM, FDM, aria2).
@@ -84,10 +97,10 @@ flowchart TD
 
 | Platform | Deployment Button |
 |---|---|
-| **Koyeb** *(Recommended)* | [![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/GouthamSER/FileToLink&branch=main&builder=dockerfile) |
-| **Heroku** | [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/GouthamSER/FileToLink) |
-| **Heroku (Colab, container stack)** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1xlRGDJFAzkR0VWS_Cl6ego0qPncPlg1W/view?usp=sharing) — enter Heroku email + API key + env vars, notebook builds & deploys via `heroku.yml` |
-| **Render** | [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/GouthamSER/FileToLink) |
+| **Koyeb** *(Recommended)* | [![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/Satyajeetkumarofficial/FileToLinkStream&branch=main&builder=dockerfile) |
+| **Heroku** | [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/Satyajeetkumarofficial/FileToLinkStream) |
+| **Heroku (Colab, container stack)** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1U_bWcaWD8pdRqFknp72yA1z_w28g5S5k?usp=sharing) — open it, *File → Save a copy in Drive*, enter your own Heroku email + API key + env vars. It builds & deploys via `heroku.yml`, then auto-wipes your secrets from the Colab session. Source: [`colab/Deploy_to_Heroku.ipynb`](colab/Deploy_to_Heroku.ipynb) |
+| **Render** | [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Satyajeetkumarofficial/FileToLinkStream) |
 
 ---
 
@@ -95,8 +108,8 @@ flowchart TD
 
 ```bash
 # Clone the repository
-git clone https://github.com/GouthamSER/FileToLink.git
-cd FileToLink
+git clone https://github.com/Satyajeetkumarofficial/FileToLinkStream.git
+cd FileToLinkStream
 
 # Install dependencies
 pip install -r requirements.txt
@@ -187,7 +200,7 @@ FileToLink/
 │   ├── server/
 │   │   └── exceptions.py      # Custom exceptions (InvalidHash, FIleNotFound)
 │   ├── template/
-│   │   ├── watch.html         # Reimagined Cyberpunk Glassmorphic Video/Audio Player
+│   │   ├── movi.html          # Movi Player video/audio page (audio+subtitle tracks)
 │   │   ├── dl.html            # High-Speed Download Portal & acceleration guide
 │   │   └── home.html          # Next-Gen Telegram Stream & Cloud Hub Dashboard
 │   └── util/
@@ -222,8 +235,8 @@ Bump the version in `lib/__init__.py` and add a row here on every release.
 
 ## 🤝 Support & Community
 
-- **Developer**: [Goutham](https://github.com/GouthamSER)
-- **Updates Channel**: [@wudixh15](https://t.me/wudixh15)
+- **Developer**: [Satyajeetkumarofficial](https://github.com/Satyajeetkumarofficial)
+- **Updates Channel**: [@ProXBotz](https://t.me/ProXBotz)
 - **License**: [GNU General Public License v3.0](LICENSE)
 
 <div align="center">

@@ -1,7 +1,7 @@
 {
   "name": "FileToLink",
   "description": "Send a file, get an instant streaming + download link.",
-  "repository": "https://github.com/GouthamSER/FileToLink",
+  "repository": "https://github.com/Satyajeetkumarofficial/FileToLinkStream",
   "logo": "https://img.icons8.com/fluency/96/link.png",
   "keywords": ["telegram", "bot", "pyrogram", "file-to-link", "streaming"],
   "stack": "container",

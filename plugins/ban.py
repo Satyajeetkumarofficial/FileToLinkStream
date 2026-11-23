@@ -8,7 +8,7 @@ from pyrogram.types import Message, CallbackQuery
 from info import is_admin
 from database.users_chats_db import db
 
-CONTACT_ADMIN = "@im_goutham_josh"
+CONTACT_ADMIN = "@satyajeetkumarofficial"
 
 BAN_NOTICE = (
     "🚫 <b>You have been banned from this bot.</b>\n\n"
